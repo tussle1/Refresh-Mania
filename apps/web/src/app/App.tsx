@@ -280,7 +280,13 @@ export function App() {
   }, []);
 
   if (storeError) {
-    return <BootScreen title="Local storage unavailable" detail={`${storeError}. Beatmap import and score saving need IndexedDB. Use a current desktop browser with storage enabled.`} />;
+    return (
+      <BootScreen
+        title="Local storage unavailable"
+        detail={`The browser refused to open the local database (${storeError}). Beatmap import and score saving need IndexedDB. If this is a private or incognito window, open the page in a normal window. Otherwise allow site data for this site, close other tabs of it, and try again.`}
+        action={<button type="button" onClick={() => window.location.reload()}>Try again</button>}
+      />
+    );
   }
   if (!ready || !store) return <BootScreen title="bad!osu" detail="Opening local library…" />;
 

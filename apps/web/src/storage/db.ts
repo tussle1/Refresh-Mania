@@ -71,8 +71,17 @@ export function openDatabase(factory: IDBFactory = indexedDB): Promise<IDBDataba
       if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings', { keyPath: 'key' });
       if (!db.objectStoreNames.contains('favorites')) db.createObjectStore('favorites', { keyPath: 'hash' });
     };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error ?? new Error('IndexedDB unavailable'));
+    req.onsuccess = () => {
+      const db = req.result;
+      // A newer tab upgrading the schema should not be blocked by this one.
+      db.onversionchange = () => db.close();
+      resolve(db);
+    };
+    req.onerror = () => {
+      // Keep the browser's own error name and message so the user can act on it.
+      const e = req.error;
+      reject(new Error(e ? `${e.name}: ${e.message}` : 'IndexedDB unavailable'));
+    };
     req.onblocked = () => reject(new Error('Database upgrade blocked by another tab.'));
   });
 }
