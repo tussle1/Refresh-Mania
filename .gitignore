@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+
+# Generated sample beatmap archives (npm run sample)
+apps/web/samples/
